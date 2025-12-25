@@ -2,7 +2,7 @@ from gevent import monkey; monkey.patch_all(thread=False)
 import time
 from collections import defaultdict
 import hashlib, pickle
-from aoab.core.add import ADD  # 引用上面的文件
+from aoab.core.add import ADD  
 
 def hash(x):
     return hashlib.sha256(pickle.dumps(x)).digest()
