@@ -1,6 +1,8 @@
 import gevent
 from gevent import monkey;
+from aoab.core.aoab import aoab
 
+import os  
 import network
 
 monkey.patch_all(thread=False)
@@ -122,6 +124,31 @@ if __name__ == '__main__':
         stop = mpValue(c_bool, False)
         if P == 'ng':
             net_client = network.socket_client_ng.NetworkClient(my_address[1], my_address[0], i, addresses, client_from_bft, client_ready, stop)
+        elif P == 'aoab':
+    # --- AOAB 启动逻辑 ---
+    print("Running AOAB protocol...")
+
+    # 1. 定义输入函数：模拟客户端不断产生交易
+    # 这里每次产生 B 字节的随机数据作为 "Batch"
+    def env_input():
+        # 简单的流控：稍微睡一下，避免生产太快
+        # gevent.sleep(0.001)
+        return os.urandom(B)
+
+    # 2. 定义输出函数：处理共识完成的交易
+    def env_output(txs):
+        # txs 是一个列表，包含排好序的交易
+        pass 
+        # 你可以在这里打印日志，例如:
+        # print(f"Node {id} delivered {len(txs)} txs")
+
+    # 3. 启动 AOAB 主进程
+    # 注意参数对应：
+    # - sPK2s, sSK2: 也就是代码中的 PK2s, SK2 (阈值签名密钥，用于PRBC和MVBA)
+    # - client.recv, client.send: 网络通信接口
+    aoab(sid, id, N, f, sPK2s, sSK2, 
+         env_input, env_output, 
+         client.recv, client.send)
         else:
             net_client = network.socket_client.NetworkClient(my_address[1], my_address[0], i, addresses, client_from_bft, client_ready, stop)
         net_server = NetworkServer(my_address[1], my_address[0], i, addresses, server_to_bft, server_ready, stop)
